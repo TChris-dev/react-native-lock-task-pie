@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.util.Log;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -54,7 +55,6 @@ public class RNLockTaskModule extends ReactContextBaseJavaModule {
       if (mActivity != null) {
         DevicePolicyManager myDevicePolicyManager = (DevicePolicyManager) mActivity.getSystemService(Context.DEVICE_POLICY_SERVICE);
         ComponentName mDPM = new ComponentName(mActivity, MyAdmin.class);
-
         if (myDevicePolicyManager.isDeviceOwnerApp(mActivity.getPackageName())) {
           ArrayList<String> packages = new ArrayList<>();
           packages.add(mActivity.getPackageName());
@@ -64,9 +64,11 @@ public class RNLockTaskModule extends ReactContextBaseJavaModule {
             }
           }
           myDevicePolicyManager.setLockTaskPackages(mDPM, packages.toArray(new String[0]));
+          myDevicePolicyManager.setLockTaskFeatures(mDPM, DevicePolicyManager.LOCK_TASK_FEATURE_SYSTEM_INFO);
           mActivity.startLockTask();
           promise.resolve(LOCKED_TASK_AS_OWNER);
         } else {
+          myDevicePolicyManager.setLockTaskFeatures(mDPM, DevicePolicyManager.LOCK_TASK_FEATURE_SYSTEM_INFO);
           mActivity.startLockTask();
           promise.resolve(LOCKED_TASK);
         }
